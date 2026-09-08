@@ -3,6 +3,8 @@ node_modules/
 .env.*
 *.log
 .DS_Store
+
+# AI agent, instructions, skills & IDE folders
 .agents/
 .claude/
 .kilocode/
@@ -10,6 +12,21 @@ node_modules/
 .cursor/
 .windsurf/
 .vscode/
+.gemini/
+skills/
+skills-lock.json
+AGENTS.md
+Agents.md
+agents.md
+
+# Design files & instructions
+DESIGN*.MD
+DESIGN*.md
+design*.md
+design*.MD
+docs/
+
+# Build & test artifacts
 dist/
 build/
 .astro/
@@ -17,3 +34,4 @@ test_*.js
 test_*.docx
 test_*.pdf
 test_*.html
+scratch/
