@@ -1,0 +1,23 @@
+---
+interface Props {
+  variant?: 'default' | 'featured-glassy';
+  class?: string;
+  id?: string;
+  [key: string]: any;
+}
+
+const {
+  variant = 'default',
+  class: className = '',
+  id,
+  ...rest
+} = Astro.props;
+
+const baseClass = variant === 'featured-glassy'
+  ? 'card-featured p-6 md:p-8 relative overflow-hidden'
+  : 'card-glass p-6 md:p-8 relative overflow-hidden';
+---
+
+<div class={`${baseClass} ${className}`} id={id} {...rest}>
+  <slot />
+</div>

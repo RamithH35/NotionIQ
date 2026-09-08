@@ -1,0 +1,254 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+import Card from '../components/Card.astro';
+---
+
+<Layout title="NotionIQ — AI Document Cognition & Knowledge Mastery">
+  <!-- Hero Section -->
+  <section class="relative pt-20 pb-28 md:pt-28 md:pb-36 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <!-- Grayscale Hero Glow Backdrop per DESIGN.md -->
+    <div class="hero-glow-backdrop"></div>
+
+    <div class="max-w-5xl mx-auto text-center relative z-10">
+      <!-- JetBrains Mono Eyebrow -->
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-[6px] bg-[#121212] border border-[#2a2a2a] mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#fafafa]"></span>
+        <span class="font-mono text-xs uppercase tracking-eyebrow text-[#b0b0b0]">
+          Intelligent Document Synthesis & Recall
+        </span>
+      </div>
+
+      <!-- Tight-Tracked Hero Headline -->
+      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-semibold tracking-display-xl leading-[1.05] text-[#fafafa] max-w-4xl mx-auto mb-6">
+        Turn complex notes into active mastery.
+      </h1>
+
+      <!-- Subhead -->
+      <p class="text-base sm:text-lg text-[#b0b0b0] max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
+        Ingest engineering documentation, dense research papers, or markdown notes. NotionIQ extracts core mental models, synthesizes key concepts, and generates active-recall quizzes in seconds.
+      </p>
+
+      <!-- CTAs (White Pill + 6px Square) -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+        <Button href="/signup" variant="primary-pill" class="w-full sm:w-auto px-8" id="hero-get-started-cta">
+          Start Free Workspace
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </Button>
+        <Button href="/about" variant="secondary-square" class="w-full sm:w-auto px-6 h-11" id="hero-explore-cta">
+          Explore Architecture
+        </Button>
+      </div>
+
+      <!-- Featured Interactive Product Mockup (Protagonist) -->
+      <div class="max-w-4xl mx-auto text-left">
+        <Card variant="featured-glassy" class="!p-0 border border-[#3a3a3a] shadow-2xl bg-[#121212]">
+          <!-- Window Chrome -->
+          <div class="px-4 py-3 bg-[#191919] border-b border-[#2a2a2a] flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-[#2a2a2a]"></div>
+              <div class="w-3 h-3 rounded-full bg-[#2a2a2a]"></div>
+              <div class="w-3 h-3 rounded-full bg-[#2a2a2a]"></div>
+              <span class="font-mono text-xs text-[#7a7a7a] ml-2">notioniq-workspace / Raft_Consensus_Protocol.md</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-[11px] text-[#7a7a7a] px-2 py-0.5 rounded-[4px] bg-[#121212] border border-[#2a2a2a]">STREAMING READY</span>
+            </div>
+          </div>
+
+          <!-- Mockup Grid Content -->
+          <div class="grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-[#2a2a2a]">
+            <!-- Left: Document Context -->
+            <div class="md:col-span-6 p-6 space-y-4 bg-[#0a0a0a]/50">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-xs uppercase tracking-wider text-[#7a7a7a]">Source Document</span>
+                <span class="text-xs text-[#525252]">428 words</span>
+              </div>
+              <h3 class="text-base font-semibold text-[#fafafa] tracking-tight">Raft Consensus Algorithm: Leader Election</h3>
+              <p class="text-xs text-[#b0b0b0] leading-relaxed">
+                Raft decomposes consensus into three independent subproblems: Leader Election, Log Replication, and Safety. Nodes exist in one of three states: Follower, Candidate, or Leader. Election timeouts are randomized between 150ms and 300ms to prevent split votes.
+              </p>
+              <div class="p-3 rounded-[6px] bg-[#121212] border border-[#2a2a2a] font-mono text-[11px] text-[#b0b0b0]">
+                <code>heartbeat_interval = 50ms<br/>election_timeout = random(150ms, 300ms)</code>
+              </div>
+            </div>
+
+            <!-- Right: AI Synthesizer & Action -->
+            <div class="md:col-span-6 p-6 space-y-4 bg-[#141516]/70">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="w-2 h-2 rounded-full bg-[#fafafa]"></div>
+                  <span class="font-mono text-xs uppercase tracking-wider text-[#fafafa]">Cognitive Synthesis</span>
+                </div>
+                <span class="font-mono text-[11px] text-[#7a7a7a] bg-[#191919] px-2 py-0.5 rounded border border-[#2a2a2a]">via Claude 3.7</span>
+              </div>
+              <div class="space-y-2">
+                <div class="p-3 rounded-[6px] bg-[#191919] border border-[#2a2a2a] text-xs space-y-1.5">
+                  <div class="font-medium text-[#fafafa]">Key Concept Extraction:</div>
+                  <p class="text-[#b0b0b0] font-mono text-[11px] leading-relaxed">
+                    Split-vote mitigation occurs through randomized timer offsets. Followers convert to Candidates only upon timeout expiration without leader append entries.
+                  </p>
+                </div>
+                <div class="flex items-center justify-between pt-2">
+                  <span class="font-mono text-xs text-[#3dd68c] flex items-center gap-1.5">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    3 Quiz Questions Ready
+                  </span>
+                  <a href="/quiz" class="btn-primary-pill text-xs h-8 px-4 font-medium">
+                    Run Quiz &rarr;
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3-Up Glassy Feature Cards Grid -->
+  <section class="py-20 px-4 sm:px-6 lg:px-8 border-t border-[#191919]">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
+        <span class="font-mono text-xs uppercase tracking-eyebrow text-[#7a7a7a]">Core Capabilities</span>
+        <h2 class="text-3xl font-semibold tracking-heading-lg text-[#fafafa]">
+          Engineered for deep comprehension.
+        </h2>
+        <p class="text-sm text-[#b0b0b0] leading-relaxed">
+          Built with hairline precision, deterministic grounding, and zero hallucinated cognitive noise.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Feature 1 -->
+        <Card variant="default" class="group hover:-translate-y-1 transition-transform">
+          <div class="w-10 h-10 rounded-[6px] bg-[#191919] border border-[#2a2a2a] group-hover:border-[#3a3a3a] flex items-center justify-center mb-6 text-[#fafafa] transition-colors">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+              <path d="M7 10v4M10 7h4M17 10v4M10 17h4"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-[#fafafa] mb-2 tracking-heading-md">
+            Context-Aware Synthesis
+          </h3>
+          <p class="text-sm text-[#b0b0b0] leading-relaxed">
+            Parses hierarchical markdown, code blocks, and formulas. Constructs dense semantic embeddings for zero-loss concept retrieval.
+          </p>
+        </Card>
+
+        <!-- Feature 2 (Featured) -->
+        <Card variant="featured-glassy" class="group hover:-translate-y-1 transition-transform">
+          <div class="w-10 h-10 rounded-[6px] bg-[#222222] border border-[#3a3a3a] flex items-center justify-center mb-6 text-[#fafafa]">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              <circle cx="12" cy="12" r="9" stroke="currentColor" fill="none"></circle>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-[#fafafa] mb-2 tracking-heading-md">
+            Active Recall Quizzing
+          </h3>
+          <p class="text-sm text-[#b0b0b0] leading-relaxed">
+            Generates multiple-choice and conceptual verification checks designed to test deep understanding, edge cases, and architectural trade-offs.
+          </p>
+        </Card>
+
+        <!-- Feature 3 -->
+        <Card variant="default" class="group hover:-translate-y-1 transition-transform">
+          <div class="w-10 h-10 rounded-[6px] bg-[#191919] border border-[#2a2a2a] group-hover:border-[#3a3a3a] flex items-center justify-center mb-6 text-[#fafafa] transition-colors">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="4 17 10 11 4 5"></polyline>
+              <line x1="12" y1="19" x2="20" y2="19"></line>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-[#fafafa] mb-2 tracking-heading-md">
+            Streaming Monospace Output
+          </h3>
+          <p class="text-sm text-[#b0b0b0] leading-relaxed">
+            Clean typewriter reveals in JetBrains Mono with exact line numbering, structured summaries, and model provider telemetry.
+          </p>
+        </Card>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section with Visible Connected Line -->
+  <section class="py-24 px-4 sm:px-6 lg:px-8 border-t border-[#191919] bg-[#0a0a0a]">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto mb-20 space-y-3">
+        <span class="font-mono text-xs uppercase tracking-eyebrow text-[#7a7a7a]">Execution Pipeline</span>
+        <h2 class="text-3xl font-semibold tracking-heading-lg text-[#fafafa]">
+          From raw document to verified mastery.
+        </h2>
+      </div>
+
+      <!-- 3-Step Flow with Connecting Line -->
+      <div class="relative">
+        <!-- Visible connecting track line on desktop -->
+        <div class="hidden md:block absolute top-1/2 left-[15%] right-[15%] h-[1px] bg-[#2a2a2a] -translate-y-6 z-0"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">
+          <!-- Step 1 -->
+          <div class="flex flex-col items-center text-center space-y-4">
+            <div class="w-12 h-12 rounded-[6px] bg-[#121212] border border-[#2a2a2a] flex items-center justify-center font-mono font-semibold text-sm text-[#fafafa] shadow-md">
+              01
+            </div>
+            <h4 class="text-base font-semibold text-[#fafafa] tracking-tight">Ingest Raw Sources</h4>
+            <p class="text-xs text-[#7a7a7a] max-w-xs leading-relaxed">
+              Upload markdown, technical notes, RFCs, or code snippets directly into your private workspace sandbox.
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="flex flex-col items-center text-center space-y-4">
+            <div class="w-12 h-12 rounded-[6px] bg-[#191919] border border-[#3a3a3a] flex items-center justify-center font-mono font-semibold text-sm text-[#fafafa] shadow-md">
+              02
+            </div>
+            <h4 class="text-base font-semibold text-[#fafafa] tracking-tight">Vector Cognition & Analysis</h4>
+            <p class="text-xs text-[#7a7a7a] max-w-xs leading-relaxed">
+              Our deterministic synthesizer identifies core invariants, boundary conditions, and relational dependency trees.
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="flex flex-col items-center text-center space-y-4">
+            <div class="w-12 h-12 rounded-[6px] bg-[#121212] border border-[#2a2a2a] flex items-center justify-center font-mono font-semibold text-sm text-[#fafafa] shadow-md">
+              03
+            </div>
+            <h4 class="text-base font-semibold text-[#fafafa] tracking-tight">Active Recall Quizzing</h4>
+            <p class="text-xs text-[#7a7a7a] max-w-xs leading-relaxed">
+              Validate mental models with instant feedback, explanations, and verifiable score metrics.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Closing CTA Band -->
+  <section class="py-24 px-4 sm:px-6 lg:px-8 border-t border-[#191919] relative overflow-hidden">
+    <div class="max-w-4xl mx-auto text-center space-y-8 relative z-10">
+      <h2 class="text-3xl sm:text-5xl font-semibold tracking-display-xl text-[#fafafa] max-w-2xl mx-auto">
+        Ready to master your knowledge stack?
+      </h2>
+      <p class="text-sm sm:text-base text-[#b0b0b0] max-w-lg mx-auto leading-relaxed">
+        Experience high-velocity cognition with zero chromatic clutter. Fast, focused, and built for serious engineering workflows.
+      </p>
+      <div class="flex items-center justify-center gap-4 pt-2">
+        <Button href="/signup" variant="primary-pill" class="px-8" id="footer-cta-signup">
+          Launch Free Workspace
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </Button>
+        <Button href="/workspace" variant="secondary-square" class="px-6 h-11" id="footer-cta-workspace">
+          Open Demo Workspace
+        </Button>
+      </div>
+    </div>
+  </section>
+</Layout>

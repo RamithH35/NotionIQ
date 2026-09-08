@@ -1,0 +1,939 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Workspace — NotionIQ AI Document Analysis" hideFooter={true}>
+  <!-- Full Screen Workspace Container -->
+  <div class="h-[calc(100vh-4rem)] flex flex-col md:flex-row overflow-hidden bg-[#0a0a0a]">
+    
+    <!-- LEFT SIDEBAR: Document Library & Upload Affordance & Notes Nav -->
+    <aside class="w-full md:w-80 border-r border-[#2a2a2a] bg-[#0a0a0a] flex flex-col shrink-0 h-auto md:h-full">
+      <!-- Upload Affordance -->
+      <div class="p-4 border-b border-[#2a2a2a] space-y-2">
+        <button
+          type="button"
+          id="upload-source-btn"
+          class="btn-secondary-square w-full justify-center !h-9 text-xs font-medium !bg-[#121212] hover:!bg-[#191919]"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+          </svg>
+          Upload Source Document (.pdf, .docx)
+        </button>
+        <input type="file" id="real-file-input" class="hidden" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+      </div>
+
+      <!-- Navigation Tabs: Documents vs Notes -->
+      <div class="px-3 pt-3 pb-1 flex gap-1 border-b border-[#2a2a2a]">
+        <button
+          type="button"
+          id="tab-docs-btn"
+          class="flex-1 py-1.5 px-3 rounded-[6px] text-xs font-medium bg-[#191919] text-[#fafafa] border border-[#2a2a2a] transition-all"
+        >
+          Sources
+        </button>
+        <button
+          type="button"
+          id="tab-notes-btn"
+          class="flex-1 py-1.5 px-3 rounded-[6px] text-xs font-medium text-[#7a7a7a] hover:text-[#fafafa] hover:bg-[#121212] border border-transparent transition-all"
+        >
+          Notes
+        </button>
+      </div>
+
+      <!-- Documents Sidebar View -->
+      <div id="docs-sidebar-view" class="flex-1 flex flex-col overflow-hidden">
+        <!-- Document List Header -->
+        <div class="px-4 py-2 flex items-center justify-between text-xs text-[#7a7a7a]">
+          <span class="font-mono uppercase tracking-wider text-[10px]" id="doc-count-label">Sources</span>
+          <span class="font-mono text-[10px]">Synced</span>
+        </div>
+
+        <!-- Document List Container -->
+        <div class="flex-1 overflow-y-auto p-2 space-y-1" id="doc-list">
+          <div class="p-4 text-center font-mono text-xs text-[#7a7a7a]">Loading sources...</div>
+        </div>
+      </div>
+
+      <!-- Notes Sidebar View (Initially Hidden) -->
+      <div id="notes-sidebar-view" class="hidden flex-1 flex-col overflow-hidden">
+        <div class="p-3 border-b border-[#2a2a2a] flex items-center justify-between">
+          <span class="font-mono uppercase tracking-wider text-[10px] text-[#7a7a7a]" id="notes-count-label">Notes (0)</span>
+          <button
+            type="button"
+            id="create-new-note-btn"
+            class="btn-secondary-square !h-7 !px-2.5 text-[11px]"
+          >
+            + New Note
+          </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-2 space-y-1" id="notes-list">
+          <div class="p-4 text-center font-mono text-xs text-[#7a7a7a]">No notes yet.</div>
+        </div>
+      </div>
+
+      <!-- Sidebar Footer Status -->
+      <div class="p-3 border-t border-[#2a2a2a] bg-[#0a0a0a] flex items-center justify-between text-[11px] text-[#7a7a7a]">
+        <div class="flex items-center gap-1.5 font-mono">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#fafafa]"></span>
+          <span>Vector Sandbox</span>
+        </div>
+        <span class="font-mono text-[#525252]" id="user-quota-status">Public Demo Mode</span>
+      </div>
+    </aside>
+
+    <!-- MAIN CENTER PANEL: Document Source Viewer OR Notes Editor -->
+    <main class="flex-1 border-r border-[#2a2a2a] flex flex-col bg-[#0a0a0a] overflow-hidden">
+      <!-- Error / Notification Toast -->
+      <div id="workspace-alert" class="hidden mx-4 mt-3 p-3 rounded-[6px] bg-[#191919] border border-[#e5484d] text-xs text-[#e5484d] flex items-center justify-between">
+        <span id="workspace-alert-msg">Notification</span>
+        <button type="button" id="workspace-alert-close" class="text-[#b0b0b0] hover:text-white">&times;</button>
+      </div>
+
+      <!-- DOC VIEW CONTAINER -->
+      <div id="center-doc-container" class="flex-1 flex flex-col overflow-hidden">
+        <!-- Document Action Bar -->
+        <div class="h-12 border-b border-[#2a2a2a] px-4 flex items-center justify-between bg-[#121212]/50 shrink-0">
+          <div class="flex items-center gap-2 truncate">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[#7a7a7a] shrink-0">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <span id="current-doc-title" class="font-medium text-xs text-[#fafafa] truncate">
+              Loading...
+            </span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span id="doc-meta-stats" class="font-mono text-[11px] text-[#7a7a7a]">-- words</span>
+            <button id="delete-user-doc-btn" class="hidden btn-secondary-square !h-7 !px-2.5 text-xs text-[#e5484d] hover:border-[#e5484d]">
+              Delete Document
+            </button>
+          </div>
+        </div>
+
+        <!-- Document Content Body -->
+        <div class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 text-sm text-[#b0b0b0] leading-relaxed max-w-3xl" id="doc-content-body">
+          <div class="p-4 text-center font-mono text-xs text-[#7a7a7a]">Select a document from the left sidebar to view.</div>
+        </div>
+      </div>
+
+      <!-- NOTE EDIT CONTAINER (Initially Hidden) -->
+      <div id="center-note-container" class="hidden flex-1 flex-col overflow-hidden p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-[#2a2a2a] pb-3">
+          <input
+            type="text"
+            id="note-title-input"
+            placeholder="Note title..."
+            class="w-full bg-transparent text-xl font-semibold text-[#fafafa] focus:outline-none placeholder-[#525252]"
+          />
+          <div class="flex items-center gap-2 shrink-0">
+            <button type="button" id="save-note-btn" class="btn-primary-pill !h-8 !px-4 text-xs font-medium">Save Note</button>
+            <button type="button" id="delete-note-btn" class="btn-secondary-square !h-8 !px-3 text-xs text-[#e5484d]">Delete</button>
+          </div>
+        </div>
+        <textarea
+          id="note-content-input"
+          placeholder="Capture insights, synthesized notes, or study points..."
+          class="flex-1 w-full p-4 rounded-[8px] bg-[#121212] border border-[#2a2a2a] text-sm text-[#fafafa] placeholder-[#525252] focus:outline-none focus:border-[#fafafa] resize-none leading-relaxed font-sans"
+        ></textarea>
+      </div>
+    </main>
+
+    <!-- RIGHT PANEL: AI Analysis, Monospace Typewriter Output, and Provider Badges -->
+    <aside class="w-full md:w-[420px] lg:w-[460px] flex flex-col bg-[#0a0a0a] shrink-0 h-auto md:h-full">
+      <!-- AI Panel Header -->
+      <div class="h-12 border-b border-[#2a2a2a] px-4 flex items-center justify-between bg-[#121212]/50 shrink-0">
+        <div class="flex items-center gap-2">
+          <div class="w-2 h-2 rounded-full bg-[#fafafa]"></div>
+          <span class="font-semibold text-xs text-[#fafafa]">Cognitive AI Engine</span>
+        </div>
+        <!-- Model Provider Badge updated dynamically -->
+        <span id="model-provider-badge" class="font-mono text-[10px] text-[#7a7a7a] px-2 py-0.5 rounded bg-[#191919] border border-[#2a2a2a]">
+          via Gemini 3.6 Flash
+        </span>
+      </div>
+
+      <!-- Action Area: Create Short Notes + Selectable Quiz Length -->
+      <div class="p-4 border-b border-[#2a2a2a] bg-[#121212]/30 space-y-3">
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            id="trigger-create-notes-btn"
+            class="btn-primary-pill flex-1 justify-center text-xs !h-9 font-medium"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Create Short Notes
+          </button>
+        </div>
+
+        <!-- Quiz Length Selector & Trigger Row -->
+        <div class="flex items-center gap-2 pt-1 border-t border-[#2a2a2a]/60">
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="text-[11px] font-mono text-[#7a7a7a]">Length:</span>
+            <select
+              id="quiz-length-select"
+              class="bg-[#191919] border border-[#2a2a2a] text-[#fafafa] text-xs rounded-[6px] px-2 py-1 font-mono focus:outline-none focus:border-[#fafafa]"
+            >
+              <option value="5" selected>5 Qs</option>
+              <option value="10">10 Qs</option>
+              <option value="15">15 Qs</option>
+              <option value="20">20 Qs</option>
+            </select>
+          </div>
+          <button
+            type="button"
+            id="trigger-quiz-btn"
+            class="btn-secondary-square flex-1 justify-center !h-8 text-xs font-medium !bg-[#191919] hover:!bg-[#222222]"
+          >
+            Generate Quiz
+          </button>
+        </div>
+
+        <!-- Latency / In-flight indicator -->
+        <div id="ai-loading-indicator" class="hidden p-2.5 rounded-[6px] bg-[#191919] border border-[#3a3a3a] items-center gap-2 text-xs text-[#b0b0b0]">
+          <svg class="animate-spin h-3.5 w-3.5 text-[#fafafa] shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <div class="flex flex-col">
+            <span id="ai-loading-text" class="font-medium text-[#fafafa]">Generating structured notes...</span>
+            <span class="text-[10px] text-[#7a7a7a]">Usually takes 5-15 seconds</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Monospace Output Panel -->
+      <div class="flex-1 overflow-y-auto p-4 space-y-4" id="ai-panel-body">
+        <div class="p-4 rounded-[12px] bg-[#191919] border border-[#2a2a2a] space-y-3">
+          <div class="flex items-center justify-between border-b border-[#2a2a2a] pb-2">
+            <span class="font-mono text-[11px] uppercase tracking-wider text-[#fafafa] flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#3dd68c]"></span>
+              Synthesis Stream
+            </span>
+            <span id="stream-status-badge" class="font-mono text-[10px] text-[#7a7a7a]">READY</span>
+          </div>
+
+          <!-- Typewriter Output Box -->
+          <div id="typewriter-output" class="font-mono text-xs text-[#fafafa] space-y-2 leading-relaxed min-h-[140px] whitespace-pre-wrap">
+            <p class="text-[#7a7a7a] italic font-sans text-xs">
+              Select a document and click "Create Short Notes" for scannable points or "Generate Quiz" for active recall problems.
+            </p>
+          </div>
+
+          <!-- Add to Notes Form & Button (Revealed after notes creation) -->
+          <div id="add-to-notes-container" class="hidden pt-3 border-t border-[#2a2a2a] space-y-2">
+            <div class="flex flex-col sm:flex-row gap-2">
+              <input
+                type="text"
+                id="add-to-notes-title-input"
+                placeholder="Note title (e.g. Raft Consensus Key Points)"
+                class="flex-1 bg-[#121212] border border-[#2a2a2a] rounded-[6px] px-3 py-1.5 text-xs text-[#fafafa] focus:outline-none focus:border-[#fafafa]"
+              />
+              <button
+                type="button"
+                id="confirm-add-to-notes-btn"
+                class="btn-primary-pill !h-8 !px-4 text-xs font-medium justify-center shrink-0"
+              >
+                + Add to Notes
+              </button>
+            </div>
+            <div id="add-to-notes-success" class="hidden text-[11px] font-mono text-[#3dd68c]">
+              ✓ Note saved to your Notes section!
+            </div>
+          </div>
+        </div>
+
+        <!-- Generated Quiz Jump Box -->
+        <div id="quiz-ready-box" class="hidden p-4 rounded-[12px] bg-[#141516] border border-[#3a3a3a] space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-xs text-[#3dd68c] font-medium flex items-center gap-1.5">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Active Recall Suite Ready
+            </span>
+          </div>
+          <p class="text-xs text-[#b0b0b0]" id="quiz-ready-desc">
+            Conceptual verification problems formulated for this document.
+          </p>
+          <a id="quiz-launch-link" href="/quiz" class="btn-primary-pill w-full justify-center !h-9 text-xs font-medium">
+            Launch Interactive Quiz &rarr;
+          </a>
+        </div>
+      </div>
+    </aside>
+  </div>
+</Layout>
+
+<script>
+  interface DocItem {
+    _id: string;
+    title: string;
+    sourceType: string;
+    rawText: string;
+    pageCount: number;
+    isDemoDoc: boolean;
+  }
+
+  interface NoteItem {
+    _id: string;
+    title: string;
+    content: string;
+    linkedDocId?: { _id: string; title: string; sourceType: string } | null;
+    updatedAt: string;
+  }
+
+  let currentUser: { id: string; name: string; email: string } | null = null;
+  let docListState: DocItem[] = [];
+  let notesListState: NoteItem[] = [];
+  let activeDocId: string | null = null;
+  let activeNoteId: string | null = null;
+  let activeTab: 'docs' | 'notes' = 'docs';
+  let lastGeneratedNotesContent: string = '';
+
+  const docListEl = document.getElementById('doc-list');
+  const docTitleEl = document.getElementById('current-doc-title');
+  const docStatsEl = document.getElementById('doc-meta-stats');
+  const docBodyEl = document.getElementById('doc-content-body');
+  const deleteDocBtn = document.getElementById('delete-user-doc-btn');
+  const docCountLabel = document.getElementById('doc-count-label');
+  const userQuotaStatus = document.getElementById('user-quota-status');
+
+  const tabDocsBtn = document.getElementById('tab-docs-btn');
+  const tabNotesBtn = document.getElementById('tab-notes-btn');
+  const docsSidebarView = document.getElementById('docs-sidebar-view');
+  const notesSidebarView = document.getElementById('notes-sidebar-view');
+  const centerDocContainer = document.getElementById('center-doc-container');
+  const centerNoteContainer = document.getElementById('center-note-container');
+
+  const notesListEl = document.getElementById('notes-list');
+  const notesCountLabel = document.getElementById('notes-count-label');
+  const createNewNoteBtn = document.getElementById('create-new-note-btn');
+  const noteTitleInput = document.getElementById('note-title-input') as HTMLInputElement | null;
+  const noteContentInput = document.getElementById('note-content-input') as HTMLTextAreaElement | null;
+  const saveNoteBtn = document.getElementById('save-note-btn');
+  const deleteNoteBtn = document.getElementById('delete-note-btn');
+
+  const createNotesBtn = document.getElementById('trigger-create-notes-btn') as HTMLButtonElement | null;
+  const quizBtn = document.getElementById('trigger-quiz-btn') as HTMLButtonElement | null;
+  const quizLengthSelect = document.getElementById('quiz-length-select') as HTMLSelectElement | null;
+  const aiLoadingIndicator = document.getElementById('ai-loading-indicator');
+  const aiLoadingText = document.getElementById('ai-loading-text');
+
+  const addToNotesContainer = document.getElementById('add-to-notes-container');
+  const addToNotesTitleInput = document.getElementById('add-to-notes-title-input') as HTMLInputElement | null;
+  const confirmAddToNotesBtn = document.getElementById('confirm-add-to-notes-btn');
+  const addToNotesSuccess = document.getElementById('add-to-notes-success');
+
+  const typewriter = document.getElementById('typewriter-output');
+  const streamBadge = document.getElementById('stream-status-badge');
+  const modelProviderBadge = document.getElementById('model-provider-badge');
+  const quizBox = document.getElementById('quiz-ready-box');
+  const quizLaunchLink = document.getElementById('quiz-launch-link') as HTMLAnchorElement | null;
+  const quizReadyDesc = document.getElementById('quiz-ready-desc');
+
+  const uploadBtn = document.getElementById('upload-source-btn') as HTMLButtonElement | null;
+  const fileInput = document.getElementById('real-file-input') as HTMLInputElement | null;
+  const alertBox = document.getElementById('workspace-alert');
+  const alertMsg = document.getElementById('workspace-alert-msg');
+  const alertClose = document.getElementById('workspace-alert-close');
+
+  function showAlert(msg: string) {
+    if (alertBox && alertMsg) {
+      alertMsg.textContent = msg;
+      alertBox.classList.remove('hidden');
+    }
+  }
+
+  if (alertClose && alertBox) {
+    alertClose.addEventListener('click', () => alertBox.classList.add('hidden'));
+  }
+
+  // Check auth state
+  async function checkAuth() {
+    try {
+      const res = await fetch('/api/me', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        currentUser = data.user;
+        if (userQuotaStatus) {
+          userQuotaStatus.textContent = currentUser ? `Quota: 1 user doc` : 'Public Demo Mode';
+        }
+      } else {
+        currentUser = null;
+        if (userQuotaStatus) userQuotaStatus.textContent = 'Public Demo Mode';
+      }
+    } catch {
+      currentUser = null;
+    }
+  }
+
+  function requireSignInPrompt(actionName: string): boolean {
+    if (!currentUser) {
+      showAlert(`Sign in required to ${actionName}. Redirecting to sign in...`);
+      setTimeout(() => {
+        window.location.href = `/signin?redirect=/workspace`;
+      }, 1200);
+      return true;
+    }
+    return false;
+  }
+
+  // Typewriter streaming effect
+  function simulateTypewriter(text: string, onComplete?: () => void) {
+    if (!typewriter || !streamBadge) return;
+    typewriter.textContent = '';
+    streamBadge.textContent = 'STREAMING...';
+    streamBadge.classList.add('text-[#fafafa]');
+
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < text.length) {
+        typewriter.textContent += text.charAt(i);
+        i++;
+      } else {
+        clearInterval(interval);
+        streamBadge.textContent = 'SYNTHESIZED';
+        if (onComplete) onComplete();
+      }
+    }, 6);
+  }
+
+  // Fetch Documents
+  async function loadDocuments() {
+    try {
+      const res = await fetch('/api/documents', { credentials: 'include' });
+      const data = await res.json();
+      docListState = data.documents || [];
+      renderDocList();
+
+      if (docListState.length > 0 && !activeDocId) {
+        selectDoc(docListState[0]._id);
+      }
+    } catch (e) {
+      console.error('Failed to load documents:', e);
+      if (docListEl) docListEl.innerHTML = `<div class="p-4 text-xs text-[#e5484d]">Could not connect to server.</div>`;
+    }
+  }
+
+  function renderDocList() {
+    if (!docListEl) return;
+    if (docCountLabel) docCountLabel.textContent = `Sources (${docListState.length})`;
+
+    if (docListState.length === 0) {
+      docListEl.innerHTML = `<div class="p-4 text-center font-mono text-xs text-[#7a7a7a]">No documents available.</div>`;
+      return;
+    }
+
+    docListEl.innerHTML = '';
+    docListState.forEach((doc) => {
+      const isActive = doc._id === activeDocId;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `w-full text-left p-3 rounded-[6px] transition-all flex flex-col gap-1 relative ${
+        isActive
+          ? 'bg-[#191919] border-l-2 border-l-[#fafafa] border border-[#2a2a2a]'
+          : 'hover:bg-[#121212] border border-transparent hover:border-[#2a2a2a]'
+      }`;
+      btn.setAttribute('data-doc-id', doc._id);
+
+      const ext = (doc.sourceType || 'doc').toUpperCase();
+      const firstLine = doc.rawText.split('\n').find((l) => l.trim() && !l.startsWith('#')) || 'Document content';
+
+      btn.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="font-medium text-xs ${isActive ? 'text-[#fafafa]' : 'text-[#b0b0b0]'} truncate">${doc.title}</span>
+          <span class="font-mono text-[10px] text-[#7a7a7a]">${ext}</span>
+        </div>
+        <div class="flex items-center justify-between text-[11px] text-[#7a7a7a]">
+          <span class="truncate pr-2">${firstLine.slice(0, 45)}...</span>
+          ${doc.isDemoDoc ? '<span class="text-[9px] font-mono uppercase bg-[#121212] px-1 py-0.5 rounded border border-[#2a2a2a]">Demo</span>' : ''}
+        </div>
+      `;
+
+      btn.addEventListener('click', () => selectDoc(doc._id));
+      docListEl.appendChild(btn);
+    });
+  }
+
+  function selectDoc(id: string) {
+    activeDocId = id;
+    renderDocList();
+    const doc = docListState.find((d) => d._id === id);
+    if (!doc) return;
+
+    if (docTitleEl) docTitleEl.textContent = doc.title;
+    const words = doc.rawText.split(/\s+/).filter(Boolean).length;
+    if (docStatsEl) docStatsEl.textContent = `${words} words · ${doc.pageCount || 1} pages`;
+
+    if (deleteDocBtn) {
+      if (!doc.isDemoDoc && currentUser) {
+        deleteDocBtn.classList.remove('hidden');
+      } else {
+        deleteDocBtn.classList.add('hidden');
+      }
+    }
+
+    if (docBodyEl) {
+      const paragraphs = doc.rawText
+        .split('\n\n')
+        .map((p) => p.trim())
+        .filter(Boolean)
+        .map((p) => {
+          if (p.startsWith('# ')) return `<h1 class="text-2xl font-semibold text-[#fafafa] tracking-tight">${p.slice(2)}</h1>`;
+          if (p.startsWith('## ')) return `<h2 class="text-lg font-semibold text-[#fafafa] tracking-tight mt-4">${p.slice(3)}</h2>`;
+          if (p.startsWith('### ')) return `<h3 class="text-sm font-semibold text-[#fafafa] mt-2">${p.slice(4)}</h3>`;
+          return `<p>${p}</p>`;
+        })
+        .join('');
+      docBodyEl.innerHTML = `<div class="space-y-4">${paragraphs}</div>`;
+    }
+
+    if (quizLaunchLink) {
+      quizLaunchLink.href = `/quiz?docId=${doc._id}`;
+    }
+
+    // Set default title in Add to Notes input
+    if (addToNotesTitleInput) {
+      addToNotesTitleInput.value = `${doc.title.replace(/\.[^/.]+$/, '')} — Short Notes`;
+    }
+
+    // Check if quiz already generated for this doc
+    fetch(`/api/documents/${doc._id}/quiz`, { credentials: 'include' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((qData) => {
+        if (qData && qData.quiz && quizBox) {
+          quizBox.classList.remove('hidden');
+          if (modelProviderBadge && (qData.model || qData.quiz.generatedByModel)) {
+            modelProviderBadge.textContent = `via ${qData.model || qData.quiz.generatedByModel}`;
+          }
+          if (quizReadyDesc) {
+            quizReadyDesc.textContent = `${qData.quiz.questions?.length || 4} active recall problems formulated for ${doc.title}.`;
+          }
+        } else if (quizBox) {
+          quizBox.classList.add('hidden');
+        }
+      })
+      .catch(() => {
+        if (quizBox) quizBox.classList.add('hidden');
+      });
+
+    if (typewriter) {
+      typewriter.innerHTML = `<p class="text-[#7a7a7a] italic font-sans text-xs">Switched to ${doc.title}. Ready for synthesis.</p>`;
+    }
+    if (streamBadge) streamBadge.textContent = 'READY';
+    if (addToNotesContainer) addToNotesContainer.classList.add('hidden');
+    if (addToNotesSuccess) addToNotesSuccess.classList.add('hidden');
+  }
+
+  // Delete User Doc
+  if (deleteDocBtn) {
+    deleteDocBtn.addEventListener('click', async () => {
+      if (!activeDocId) return;
+      if (requireSignInPrompt('delete this document')) return;
+      if (!confirm('Are you sure you want to delete this document from your workspace?')) return;
+
+      try {
+        const res = await fetch(`/api/documents/${activeDocId}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          showAlert(err.error || 'Failed to delete document.');
+          return;
+        }
+        activeDocId = null;
+        await loadDocuments();
+      } catch (e) {
+        showAlert('Error deleting document.');
+      }
+    });
+  }
+
+  // Upload Trigger & File Handling
+  if (uploadBtn && fileInput) {
+    uploadBtn.addEventListener('click', () => {
+      if (requireSignInPrompt('upload a document')) return;
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', async () => {
+      if (!fileInput.files || fileInput.files.length === 0) return;
+      if (requireSignInPrompt('upload a document')) return;
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = 'Parsing & Ingesting...';
+
+      try {
+        const res = await fetch('/api/documents/upload', {
+          method: 'POST',
+          credentials: 'include',
+          body: formData,
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          showAlert(data.message || data.error || 'Upload failed');
+        } else {
+          await loadDocuments();
+          if (data.document?._id) {
+            selectDoc(data.document._id);
+          }
+        }
+      } catch (err) {
+        showAlert('Network error during upload.');
+      } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+          </svg>
+          Upload Source Document (.pdf, .docx)
+        `;
+        fileInput.value = '';
+      }
+    });
+  }
+
+  // CREATE SHORT NOTES ACTION
+  if (createNotesBtn) {
+    createNotesBtn.addEventListener('click', async () => {
+      if (!activeDocId) {
+        showAlert('Please select a document first.');
+        return;
+      }
+      if (requireSignInPrompt('create short notes')) return;
+
+      createNotesBtn.disabled = true;
+      if (quizBtn) quizBtn.disabled = true;
+      if (aiLoadingIndicator && aiLoadingText) {
+        aiLoadingText.textContent = 'Generating structured short notes...';
+        aiLoadingIndicator.classList.remove('hidden');
+        aiLoadingIndicator.classList.add('flex');
+      }
+      if (streamBadge) {
+        streamBadge.textContent = 'SYNTHESIZING...';
+        streamBadge.classList.add('text-[#fafafa]');
+      }
+
+      try {
+        const res = await fetch(`/api/documents/${activeDocId}/create-notes`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+        const data = await res.json();
+        if (res.ok && (data.notes || data.analysis)) {
+          const notesText = data.notes || data.analysis;
+          lastGeneratedNotesContent = notesText;
+          if (modelProviderBadge && data.model) {
+            modelProviderBadge.textContent = `via ${data.model}`;
+          }
+          simulateTypewriter(notesText, () => {
+            if (addToNotesContainer) addToNotesContainer.classList.remove('hidden');
+          });
+        } else {
+          showAlert(data.error || 'Failed to create short notes.');
+        }
+      } catch (err) {
+        showAlert('Connection error while creating short notes.');
+      } finally {
+        createNotesBtn.disabled = false;
+        if (quizBtn) quizBtn.disabled = false;
+        if (aiLoadingIndicator) {
+          aiLoadingIndicator.classList.add('hidden');
+          aiLoadingIndicator.classList.remove('flex');
+        }
+      }
+    });
+  }
+
+  // ADD TO NOTES ACTION
+  if (confirmAddToNotesBtn) {
+    confirmAddToNotesBtn.addEventListener('click', async () => {
+      if (requireSignInPrompt('save to your notes')) return;
+      const title = addToNotesTitleInput?.value.trim() || 'Synthesized Short Notes';
+      const content = lastGeneratedNotesContent;
+
+      if (!content) {
+        showAlert('No notes content available to save.');
+        return;
+      }
+
+      confirmAddToNotesBtn.textContent = 'Saving...';
+      try {
+        const res = await fetch('/api/notes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            title,
+            content,
+            linkedDocId: activeDocId,
+          }),
+        });
+
+        if (res.ok) {
+          if (addToNotesSuccess) {
+            addToNotesSuccess.classList.remove('hidden');
+            setTimeout(() => addToNotesSuccess.classList.add('hidden'), 4000);
+          }
+          // Reload notes list if tab is used
+          await loadNotes();
+        } else {
+          const err = await res.json();
+          showAlert(err.error || 'Failed to add to Notes.');
+        }
+      } catch {
+        showAlert('Error saving note.');
+      } finally {
+        confirmAddToNotesBtn.textContent = '+ Add to Notes';
+      }
+    });
+  }
+
+  // GENERATE QUIZ ACTION (With Selectable Length and Preserved activeDocId)
+  if (quizBtn) {
+    quizBtn.addEventListener('click', async () => {
+      if (!activeDocId) {
+        showAlert('Please select a document first.');
+        return;
+      }
+      if (requireSignInPrompt('generate a quiz')) return;
+
+      const targetDocId = activeDocId;
+      const count = quizLengthSelect?.value || '5';
+
+      quizBtn.disabled = true;
+      if (createNotesBtn) createNotesBtn.disabled = true;
+      if (aiLoadingIndicator && aiLoadingText) {
+        aiLoadingText.textContent = `Formulating ${count} active recall problems...`;
+        aiLoadingIndicator.classList.remove('hidden');
+        aiLoadingIndicator.classList.add('flex');
+      }
+      if (streamBadge) {
+        streamBadge.textContent = 'GENERATING QUIZ...';
+        streamBadge.classList.add('text-[#fafafa]');
+      }
+
+      try {
+        const res = await fetch(`/api/documents/${targetDocId}/generate-quiz`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ count: parseInt(count, 10) }),
+        });
+        const data = await res.json();
+        if (res.ok && data.quiz) {
+          if (modelProviderBadge && data.model) {
+            modelProviderBadge.textContent = `via ${data.model}`;
+          }
+          const questionCount = data.quiz.questions?.length || count;
+          if (quizReadyDesc) {
+            quizReadyDesc.textContent = `${questionCount} conceptual verification problems formulated.`;
+          }
+          if (quizLaunchLink) {
+            quizLaunchLink.href = `/quiz?docId=${targetDocId}`;
+          }
+          simulateTypewriter(`[ACTIVE RECALL SUITE READY]
+• Formulated ${questionCount} conceptual active recall problems.
+• Multi-hop invariants mapped and distractor options formatted.
+• Provider: ${data.model || 'Gemini 3.6 Flash'}
+
+Click "Launch Interactive Quiz" below to test your recall.`, () => {
+            quizBox?.classList.remove('hidden');
+          });
+        } else {
+          showAlert(data.error || 'Quiz generation failed.');
+        }
+      } catch (err) {
+        showAlert('Connection error while generating quiz.');
+      } finally {
+        quizBtn.disabled = false;
+        if (createNotesBtn) createNotesBtn.disabled = false;
+        if (aiLoadingIndicator) {
+          aiLoadingIndicator.classList.add('hidden');
+          aiLoadingIndicator.classList.remove('flex');
+        }
+      }
+    });
+  }
+
+  // TAB SWITCHING: Sources vs Notes
+  function switchTab(tab: 'docs' | 'notes') {
+    activeTab = tab;
+    if (tab === 'docs') {
+      tabDocsBtn?.classList.add('bg-[#191919]', 'text-[#fafafa]', 'border-[#2a2a2a]');
+      tabDocsBtn?.classList.remove('text-[#7a7a7a]', 'border-transparent');
+      tabNotesBtn?.classList.remove('bg-[#191919]', 'text-[#fafafa]', 'border-[#2a2a2a]');
+      tabNotesBtn?.classList.add('text-[#7a7a7a]', 'border-transparent');
+
+      docsSidebarView?.classList.remove('hidden');
+      docsSidebarView?.classList.add('flex');
+      notesSidebarView?.classList.add('hidden');
+      notesSidebarView?.classList.remove('flex');
+
+      centerDocContainer?.classList.remove('hidden');
+      centerDocContainer?.classList.add('flex');
+      centerNoteContainer?.classList.add('hidden');
+      centerNoteContainer?.classList.remove('flex');
+    } else {
+      if (requireSignInPrompt('access your personal notes')) return;
+
+      tabNotesBtn?.classList.add('bg-[#191919]', 'text-[#fafafa]', 'border-[#2a2a2a]');
+      tabNotesBtn?.classList.remove('text-[#7a7a7a]', 'border-transparent');
+      tabDocsBtn?.classList.remove('bg-[#191919]', 'text-[#fafafa]', 'border-[#2a2a2a]');
+      tabDocsBtn?.classList.add('text-[#7a7a7a]', 'border-transparent');
+
+      notesSidebarView?.classList.remove('hidden');
+      notesSidebarView?.classList.add('flex');
+      docsSidebarView?.classList.add('hidden');
+      docsSidebarView?.classList.remove('flex');
+
+      centerNoteContainer?.classList.remove('hidden');
+      centerNoteContainer?.classList.add('flex');
+      centerDocContainer?.classList.add('hidden');
+      centerDocContainer?.classList.remove('flex');
+
+      loadNotes();
+    }
+  }
+
+  if (tabDocsBtn) tabDocsBtn.addEventListener('click', () => switchTab('docs'));
+  if (tabNotesBtn) tabNotesBtn.addEventListener('click', () => switchTab('notes'));
+
+  // NOTES CRUD
+  async function loadNotes() {
+    if (!currentUser) return;
+    try {
+      const res = await fetch('/api/notes', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        notesListState = data.notes || [];
+        renderNotesList();
+      }
+    } catch (e) {
+      console.error('Failed to load notes:', e);
+    }
+  }
+
+  function renderNotesList() {
+    if (!notesListEl) return;
+    if (notesCountLabel) notesCountLabel.textContent = `Notes (${notesListState.length})`;
+
+    if (notesListState.length === 0) {
+      notesListEl.innerHTML = `<div class="p-4 text-center font-mono text-xs text-[#7a7a7a]">No notes yet. Click "+ New Note" to begin.</div>`;
+      if (noteTitleInput) noteTitleInput.value = '';
+      if (noteContentInput) noteContentInput.value = '';
+      return;
+    }
+
+    notesListEl.innerHTML = '';
+    notesListState.forEach((note) => {
+      const isActive = note._id === activeNoteId;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `w-full text-left p-3 rounded-[6px] transition-all flex flex-col gap-1 relative ${
+        isActive
+          ? 'bg-[#191919] border-l-2 border-l-[#fafafa] border border-[#2a2a2a]'
+          : 'hover:bg-[#121212] border border-transparent hover:border-[#2a2a2a]'
+      }`;
+      btn.innerHTML = `
+        <span class="font-medium text-xs ${isActive ? 'text-[#fafafa]' : 'text-[#b0b0b0]'} truncate">${note.title}</span>
+        <span class="text-[11px] text-[#7a7a7a] truncate">${note.content.slice(0, 45) || 'Empty note...'}</span>
+      `;
+      btn.addEventListener('click', () => selectNote(note._id));
+      notesListEl.appendChild(btn);
+    });
+  }
+
+  function selectNote(id: string) {
+    activeNoteId = id;
+    renderNotesList();
+    const note = notesListState.find((n) => n._id === id);
+    if (!note) return;
+    if (noteTitleInput) noteTitleInput.value = note.title;
+    if (noteContentInput) noteContentInput.value = note.content;
+  }
+
+  if (createNewNoteBtn) {
+    createNewNoteBtn.addEventListener('click', () => {
+      if (requireSignInPrompt('create a note')) return;
+      activeNoteId = null;
+      if (noteTitleInput) {
+        noteTitleInput.value = 'Untitled Note';
+        noteTitleInput.focus();
+      }
+      if (noteContentInput) noteContentInput.value = '';
+    });
+  }
+
+  if (saveNoteBtn) {
+    saveNoteBtn.addEventListener('click', async () => {
+      if (requireSignInPrompt('save notes')) return;
+      const title = noteTitleInput?.value.trim() || 'Untitled Note';
+      const content = noteContentInput?.value || '';
+
+      saveNoteBtn.textContent = 'Saving...';
+      try {
+        if (activeNoteId) {
+          const res = await fetch(`/api/notes/${activeNoteId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ title, content }),
+          });
+          if (res.ok) {
+            await loadNotes();
+          }
+        } else {
+          const res = await fetch('/api/notes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ title, content, linkedDocId: activeDocId }),
+          });
+          const data = await res.json();
+          if (res.ok && data.note) {
+            activeNoteId = data.note._id;
+            await loadNotes();
+          }
+        }
+      } catch (e) {
+        showAlert('Failed to save note.');
+      } finally {
+        saveNoteBtn.textContent = 'Save Note';
+      }
+    });
+  }
+
+  if (deleteNoteBtn) {
+    deleteNoteBtn.addEventListener('click', async () => {
+      if (!activeNoteId) return;
+      if (requireSignInPrompt('delete this note')) return;
+      if (!confirm('Are you sure you want to delete this note?')) return;
+
+      try {
+        const res = await fetch(`/api/notes/${activeNoteId}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        });
+        if (res.ok) {
+          activeNoteId = null;
+          await loadNotes();
+        }
+      } catch (e) {
+        showAlert('Failed to delete note.');
+      }
+    });
+  }
+
+  // Initialize
+  checkAuth().then(() => {
+    loadDocuments();
+  });
+</script>

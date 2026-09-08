@@ -1,0 +1,338 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Card from '../components/Card.astro';
+---
+
+<Layout title="Interactive Quiz — NotionIQ Active Recall" hideFooter={true}>
+  <div class="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <!-- Background Glow -->
+    <div class="hero-glow-backdrop !top-[-150px] !w-[700px] !h-[450px]"></div>
+
+    <div class="w-full max-w-3xl space-y-6 relative z-10 mx-auto" id="quiz-container">
+      <!-- Quiz Progress Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-[#2a2a2a]">
+        <div class="flex items-center gap-3">
+          <a href="/workspace" class="btn-secondary-square !h-8 !px-3 text-xs" title="Return to Workspace">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Workspace
+          </a>
+          <span class="font-mono text-xs text-[#7a7a7a]">|</span>
+          <span class="font-mono text-xs text-[#b0b0b0]" id="question-progress-label">
+            Question 1 of 3
+          </span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <!-- Dynamic Model Provider Badge -->
+          <span id="quiz-model-badge" class="font-mono text-[10px] text-[#7a7a7a] px-2 py-0.5 rounded bg-[#191919] border border-[#2a2a2a]">
+            via OmniRoute
+          </span>
+          <div class="flex items-center gap-1.5">
+            <span class="font-mono text-xs text-[#7a7a7a]">Score:</span>
+            <span class="font-mono text-xs font-semibold text-[#fafafa]" id="live-score-label">0 / 0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Glassy Question Card -->
+      <Card variant="featured-glassy" class="!p-6 sm:!p-8 space-y-6 bg-[#121212] border border-[#2a2a2a]" id="active-question-card">
+        <!-- Question Stem -->
+        <div class="space-y-2">
+          <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-[4px] bg-[#191919] border border-[#2a2a2a]">
+            <span class="font-mono text-[10px] uppercase tracking-wider text-[#7a7a7a]" id="quiz-topic-badge">TOPIC: ACTIVE RECALL</span>
+          </div>
+          <h2 class="text-lg sm:text-xl font-semibold text-[#fafafa] leading-snug tracking-heading-md" id="question-text">
+            Loading quiz questions...
+          </h2>
+        </div>
+
+        <!-- Selectable Option Rows -->
+        <div class="space-y-3" id="options-container">
+          <!-- Options rendered via JS -->
+        </div>
+
+        <!-- Explanation / Feedback Banner (Revealed after selection) -->
+        <div id="feedback-banner" class="hidden p-4 rounded-[8px] space-y-1.5 transition-all text-xs font-sans">
+          <div class="font-semibold text-sm flex items-center gap-2" id="feedback-title"></div>
+          <p class="text-[#b0b0b0] leading-relaxed" id="feedback-desc"></p>
+        </div>
+
+        <!-- Question Card Actions -->
+        <div class="pt-4 border-t border-[#2a2a2a] flex items-center justify-between">
+          <span class="text-xs text-[#7a7a7a]" id="quiz-hint-label">
+            Select an option to evaluate your mental model.
+          </span>
+          <button
+            type="button"
+            id="next-question-btn"
+            class="btn-primary-pill hidden !h-9 text-xs px-5 font-medium"
+          >
+            Next Question &rarr;
+          </button>
+        </div>
+      </Card>
+
+      <!-- Score Summary Card (Initially Hidden) -->
+      <Card variant="featured-glassy" class="hidden !p-8 sm:!p-10 text-center space-y-6 bg-[#121212] border border-[#2a2a2a]" id="quiz-summary-card">
+        <div class="w-14 h-14 rounded-full bg-[#191919] border border-[#3a3a3a] flex items-center justify-center mx-auto text-[#fafafa]">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+
+        <div class="space-y-2">
+          <h2 class="text-2xl sm:text-3xl font-semibold tracking-heading-lg text-[#fafafa]">
+            Active Recall Session Complete
+          </h2>
+          <p class="text-xs text-[#7a7a7a]" id="quiz-summary-doc-name">
+            Document: Raft_Consensus_Protocol.md · Evaluated with deterministic scoring
+          </p>
+        </div>
+
+        <!-- Score Metrics Block -->
+        <div class="p-6 rounded-[12px] bg-[#191919] border border-[#2a2a2a] max-w-sm mx-auto grid grid-cols-2 gap-4">
+          <div class="text-left border-r border-[#2a2a2a] pr-4">
+            <span class="text-[11px] font-mono uppercase text-[#7a7a7a]">Accuracy</span>
+            <div class="text-2xl font-bold text-[#fafafa] font-mono" id="final-accuracy-percent">100%</div>
+          </div>
+          <div class="text-left pl-2">
+            <span class="text-[11px] font-mono uppercase text-[#7a7a7a]">Score</span>
+            <div class="text-2xl font-bold text-[#fafafa] font-mono" id="final-score-fraction">3 / 3</div>
+          </div>
+        </div>
+
+        <!-- Completion Actions -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+          <a href="/workspace" class="btn-primary-pill w-full sm:w-auto px-6 !h-10 text-xs font-medium">
+            Back to Workspace
+          </a>
+          <button type="button" id="retake-quiz-btn" class="btn-secondary-square w-full sm:w-auto px-6 !h-10 text-xs font-medium">
+            Retake Quiz
+          </button>
+        </div>
+      </Card>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  interface Question {
+    question?: string;
+    stem?: string;
+    topic?: string;
+    options: string[];
+    correctIndex: number;
+    explanation: string;
+  }
+
+  let questions: Question[] = [];
+  let currentQuestionIndex = 0;
+  let correctAnswersCount = 0;
+  let hasAnsweredCurrent = false;
+
+  const questionCard = document.getElementById('active-question-card');
+  const questionText = document.getElementById('question-text');
+  const optionsContainer = document.getElementById('options-container');
+  const feedbackBanner = document.getElementById('feedback-banner');
+  const feedbackTitle = document.getElementById('feedback-title');
+  const feedbackDesc = document.getElementById('feedback-desc');
+  const progressLabel = document.getElementById('question-progress-label');
+  const liveScoreLabel = document.getElementById('live-score-label');
+  const nextBtn = document.getElementById('next-question-btn');
+  const hintLabel = document.getElementById('quiz-hint-label');
+  const summaryCard = document.getElementById('quiz-summary-card');
+  const finalAccuracy = document.getElementById('final-accuracy-percent');
+  const finalScore = document.getElementById('final-score-fraction');
+  const retakeBtn = document.getElementById('retake-quiz-btn');
+  const modelBadge = document.getElementById('quiz-model-badge');
+  const topicBadge = document.getElementById('quiz-topic-badge');
+  const summaryDocName = document.getElementById('quiz-summary-doc-name');
+
+  async function loadQuiz() {
+    const params = new URLSearchParams(window.location.search);
+    let docId = params.get('docId');
+
+    try {
+      // If no docId specified, fetch documents from /api/documents (public demo docs available)
+      if (!docId) {
+        const docsRes = await fetch('/api/documents', { credentials: 'include' });
+        const docsData = await docsRes.json();
+        if (docsData.documents && docsData.documents.length > 0) {
+          docId = docsData.documents[0]._id;
+        }
+      }
+
+      if (!docId) {
+        if (questionText) questionText.textContent = 'No document found. Please return to workspace and select a source.';
+        return;
+      }
+
+      // Fetch existing quiz
+      let res = await fetch(`/api/documents/${docId}/quiz`, { credentials: 'include' });
+      if (res.status === 404) {
+        // Try generating if user is authenticated
+        res = await fetch(`/api/documents/${docId}/generate-quiz`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+      }
+
+      if (res.status === 401) {
+        if (questionText) questionText.textContent = 'Please sign in to generate new quizzes from custom documents.';
+        return;
+      }
+
+      const data = await res.json();
+      if (data && data.quiz && data.quiz.questions) {
+        questions = data.quiz.questions;
+        if (modelBadge && (data.model || data.quiz.generatedByModel)) {
+          modelBadge.textContent = `via ${data.model || data.quiz.generatedByModel}`;
+        }
+        if (summaryDocName && data.documentTitle) {
+          summaryDocName.textContent = `Document: ${data.documentTitle} · Evaluated with deterministic scoring`;
+        }
+        renderQuestion(0);
+      } else {
+        if (questionText) questionText.textContent = 'Quiz data could not be loaded.';
+      }
+    } catch (e) {
+      console.error('Quiz load error:', e);
+      if (questionText) questionText.textContent = 'Error connecting to server. Please return to workspace.';
+    }
+  }
+
+  function renderQuestion(index: number) {
+    if (!questions[index]) return;
+    const q = questions[index];
+    hasAnsweredCurrent = false;
+
+    if (progressLabel) progressLabel.textContent = `Question ${index + 1} of ${questions.length}`;
+    if (liveScoreLabel) liveScoreLabel.textContent = `${correctAnswersCount} / ${index}`;
+    if (questionText) questionText.textContent = q.question || q.stem || 'Conceptual Verification Question';
+    if (feedbackBanner) feedbackBanner.classList.add('hidden');
+    if (nextBtn) nextBtn.classList.add('hidden');
+    if (hintLabel) hintLabel.textContent = 'Select an option to evaluate your mental model.';
+    if (topicBadge) topicBadge.textContent = `QUESTION ${index + 1}`;
+
+    if (optionsContainer) {
+      optionsContainer.innerHTML = '';
+      q.options.forEach((optText, optIdx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'w-full text-left p-4 rounded-[8px] bg-[#191919] border border-[#2a2a2a] hover:border-[#3a3a3a] hover:-translate-y-[1px] transition-all flex items-start gap-3 text-xs text-[#fafafa] group';
+        btn.setAttribute('data-option-idx', optIdx.toString());
+
+        const marker = document.createElement('div');
+        marker.className = 'w-5 h-5 rounded-full border border-[#3a3a3a] group-hover:border-[#7a7a7a] flex items-center justify-center text-[10px] font-mono text-[#7a7a7a] shrink-0 mt-0.5';
+        marker.textContent = String.fromCharCode(65 + optIdx);
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'leading-relaxed text-[#fafafa] flex-1';
+        textSpan.textContent = optText;
+
+        btn.appendChild(marker);
+        btn.appendChild(textSpan);
+
+        btn.addEventListener('click', () => handleSelectOption(optIdx));
+        optionsContainer.appendChild(btn);
+      });
+    }
+  }
+
+  function handleSelectOption(selectedIdx: number) {
+    if (hasAnsweredCurrent) return;
+    hasAnsweredCurrent = true;
+
+    const q = questions[currentQuestionIndex];
+    const isCorrect = selectedIdx === q.correctIndex;
+
+    if (isCorrect) {
+      correctAnswersCount++;
+    }
+
+    if (liveScoreLabel) {
+      liveScoreLabel.textContent = `${correctAnswersCount} / ${currentQuestionIndex + 1}`;
+    }
+
+    // Highlight options
+    if (optionsContainer) {
+      const optionButtons = optionsContainer.querySelectorAll('button');
+      optionButtons.forEach((btn, idx) => {
+        btn.disabled = true;
+        btn.classList.remove('hover:border-[#3a3a3a]', 'hover:-translate-y-[1px]');
+
+        if (idx === q.correctIndex) {
+          // Success State
+          btn.classList.add('!border-[#3dd68c]', '!bg-[#3dd68c]/10');
+          const marker = btn.querySelector('div');
+          if (marker) marker.className = 'w-5 h-5 rounded-full bg-[#3dd68c] text-black font-bold flex items-center justify-center text-[10px] shrink-0 mt-0.5';
+        } else if (idx === selectedIdx && !isCorrect) {
+          // Error State
+          btn.classList.add('!border-[#e5484d]', '!bg-[#e5484d]/10');
+          const marker = btn.querySelector('div');
+          if (marker) marker.className = 'w-5 h-5 rounded-full bg-[#e5484d] text-white font-bold flex items-center justify-center text-[10px] shrink-0 mt-0.5';
+        } else {
+          btn.classList.add('opacity-40');
+        }
+      });
+    }
+
+    // Show feedback banner
+    if (feedbackBanner && feedbackTitle && feedbackDesc) {
+      feedbackBanner.classList.remove('hidden');
+      if (isCorrect) {
+        feedbackBanner.className = 'p-4 rounded-[8px] bg-[#3dd68c]/10 border border-[#3dd68c] space-y-1 text-xs';
+        feedbackTitle.className = 'font-semibold text-sm text-[#3dd68c] flex items-center gap-1.5';
+        feedbackTitle.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> Correct Evaluation`;
+      } else {
+        feedbackBanner.className = 'p-4 rounded-[8px] bg-[#e5484d]/10 border border-[#e5484d] space-y-1 text-xs';
+        feedbackTitle.className = 'font-semibold text-sm text-[#e5484d] flex items-center gap-1.5';
+        feedbackTitle.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> Incorrect Invariant`;
+      }
+      feedbackDesc.textContent = q.explanation || 'Review conceptual invariant.';
+    }
+
+    if (hintLabel) hintLabel.textContent = 'Review explanation before advancing.';
+    if (nextBtn) {
+      nextBtn.classList.remove('hidden');
+      if (currentQuestionIndex === questions.length - 1) {
+        nextBtn.textContent = 'Complete Quiz & View Score';
+      } else {
+        nextBtn.textContent = 'Next Question →';
+      }
+    }
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        renderQuestion(currentQuestionIndex);
+      } else {
+        // Show completion card
+        if (questionCard) questionCard.classList.add('hidden');
+        if (summaryCard) {
+          summaryCard.classList.remove('hidden');
+          const accuracy = Math.round((correctAnswersCount / questions.length) * 100);
+          if (finalAccuracy) finalAccuracy.textContent = `${accuracy}%`;
+          if (finalScore) finalScore.textContent = `${correctAnswersCount} / ${questions.length}`;
+        }
+      }
+    });
+  }
+
+  if (retakeBtn) {
+    retakeBtn.addEventListener('click', () => {
+      currentQuestionIndex = 0;
+      correctAnswersCount = 0;
+      if (summaryCard) summaryCard.classList.add('hidden');
+      if (questionCard) questionCard.classList.remove('hidden');
+      renderQuestion(0);
+    });
+  }
+
+  // Initial load
+  loadQuiz();
+</script>

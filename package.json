@@ -1,0 +1,35 @@
+{
+  "name": "notioniq",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "node server/index.js",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "seed": "node server/seed.js",
+    "server": "node server/index.js"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@tailwindcss/vite": "^4.0.0",
+    "astro": "^5.0.0",
+    "bcryptjs": "^3.0.3",
+    "connect-mongo": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "mammoth": "^1.12.2",
+    "mongoose": "^9.9.5",
+    "multer": "^2.3.0",
+    "pdf-parse": "^2.4.5",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.0"
+  },
+  "devDependencies": {
+    "docx": "^9.7.1",
+    "mongodb-memory-server": "^11.2.0"
+  }
+}

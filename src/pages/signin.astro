@@ -1,0 +1,177 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Card from '../components/Card.astro';
+---
+
+<Layout title="Sign In — NotionIQ" hideFooter={true}>
+  <div class="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <!-- Subtle Background Glow -->
+    <div class="hero-glow-backdrop !top-[-180px] !w-[600px] !h-[400px]"></div>
+
+    <div class="w-full max-w-md relative z-10">
+      <!-- Centered Glassy Form Card -->
+      <Card variant="featured-glassy" class="!p-8 sm:!p-10 space-y-8 bg-[#121212] border border-[#2a2a2a]">
+        <div class="text-center space-y-2">
+          <div class="w-10 h-10 rounded-[6px] bg-[#191919] border border-[#2a2a2a] flex items-center justify-center mx-auto mb-4 text-white">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 6H20M4 12H15M4 18H20" stroke-linecap="round"/>
+              <circle cx="19" cy="12" r="2" fill="currentColor" />
+            </svg>
+          </div>
+          <h1 class="text-2xl font-semibold tracking-heading-md text-[#fafafa]">
+            Sign in to NotionIQ
+          </h1>
+          <p class="text-xs text-[#7a7a7a]">
+            Access your intelligent document workspace and quizzes
+          </p>
+        </div>
+
+        <!-- Form with Inline Validation -->
+        <form id="signin-form" class="space-y-4" novalidate>
+          <div class="space-y-1.5">
+            <label for="email" class="block text-xs font-medium text-[#b0b0b0]">
+              Email address
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              autocomplete="email"
+              required
+              placeholder="alex@example.com"
+              class="w-full px-3.5 py-2.5 rounded-[6px] bg-[#191919] border border-[#2a2a2a] text-sm text-[#fafafa] placeholder-[#525252] focus:outline-none focus:border-[#fafafa] transition-colors"
+            />
+            <div id="email-error" class="hidden text-xs text-[#e5484d] pt-1">
+              Please enter a valid email address.
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label for="password" class="block text-xs font-medium text-[#b0b0b0]">
+                Password
+              </label>
+              <a href="#" class="text-xs text-[#7a7a7a] hover:text-[#fafafa] transition-colors">
+                Forgot password?
+              </a>
+            </div>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              autocomplete="current-password"
+              required
+              placeholder="••••••••••••"
+              class="w-full px-3.5 py-2.5 rounded-[6px] bg-[#191919] border border-[#2a2a2a] text-sm text-[#fafafa] placeholder-[#525252] focus:outline-none focus:border-[#fafafa] transition-colors"
+            />
+            <div id="password-error" class="hidden text-xs text-[#e5484d] pt-1">
+              Password must be at least 6 characters.
+            </div>
+          </div>
+
+          <!-- General Form Alert Banner (Initially Hidden) -->
+          <div id="form-alert" class="hidden p-3 rounded-[6px] bg-[#191919] border border-[#e5484d] text-xs text-[#e5484d]">
+            Invalid credentials. Try again.
+          </div>
+
+          <!-- Submit Button: Pill shape for primary CTA -->
+          <div class="pt-2">
+            <button
+              type="submit"
+              id="signin-submit-btn"
+              class="btn-primary-pill w-full justify-center text-sm font-medium"
+            >
+              Sign In
+            </button>
+          </div>
+        </form>
+
+        <!-- Link to Signup -->
+        <div class="text-center pt-2 border-t border-[#2a2a2a] text-xs text-[#7a7a7a]">
+          Don't have an account?{' '}
+          <a href="/signup" class="text-[#fafafa] hover:underline font-medium">
+            Create a workspace
+          </a>
+        </div>
+      </Card>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const form = document.getElementById('signin-form') as HTMLFormElement | null;
+  const emailInput = document.getElementById('email') as HTMLInputElement | null;
+  const passwordInput = document.getElementById('password') as HTMLInputElement | null;
+  const emailError = document.getElementById('email-error');
+  const passwordError = document.getElementById('password-error');
+  const formAlert = document.getElementById('form-alert');
+
+  if (form && emailInput && passwordInput) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let isValid = true;
+
+      // Email validation
+      const emailVal = emailInput.value.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailVal || !emailRegex.test(emailVal)) {
+        emailInput.classList.add('!border-[#e5484d]');
+        emailError?.classList.remove('hidden');
+        isValid = false;
+      } else {
+        emailInput.classList.remove('!border-[#e5484d]');
+        emailError?.classList.add('hidden');
+      }
+
+      // Password validation
+      const passwordVal = passwordInput.value.trim();
+      if (!passwordVal || passwordVal.length < 6) {
+        passwordInput.classList.add('!border-[#e5484d]');
+        passwordError?.classList.remove('hidden');
+        isValid = false;
+      } else {
+        passwordInput.classList.remove('!border-[#e5484d]');
+        passwordError?.classList.add('hidden');
+      }
+
+      if (isValid) {
+        const submitBtn = document.getElementById('signin-submit-btn') as HTMLButtonElement | null;
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Signing in...';
+        }
+        if (formAlert) formAlert.classList.add('hidden');
+
+        fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email: emailVal, password: passwordVal }),
+        })
+          .then(async (res) => {
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+              if (formAlert) {
+                formAlert.textContent = data.error || data.message || 'Invalid email or password.';
+                formAlert.classList.remove('hidden');
+              }
+            } else {
+              window.location.href = '/workspace';
+            }
+          })
+          .catch((err) => {
+            if (formAlert) {
+              formAlert.textContent = 'Connection error. Please try again.';
+              formAlert.classList.remove('hidden');
+            }
+          })
+          .finally(() => {
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Sign In';
+            }
+          });
+      }
+    });
+  }
+</script>

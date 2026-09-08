@@ -1,0 +1,38 @@
+---
+interface Props {
+  variant?: 'primary-pill' | 'secondary-square' | 'ghost-square' | 'action-pill';
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  class?: string;
+  id?: string;
+  [key: string]: any;
+}
+
+const {
+  variant = 'primary-pill',
+  href,
+  type = 'button',
+  class: className = '',
+  id,
+  ...rest
+} = Astro.props;
+
+const variantClass = {
+  'primary-pill': 'btn-primary-pill',
+  'secondary-square': 'btn-secondary-square',
+  'ghost-square': 'btn-ghost-square',
+  'action-pill': 'btn-primary-pill px-6 h-10 text-sm font-medium',
+}[variant] || 'btn-primary-pill';
+---
+
+{
+  href ? (
+    <a href={href} class={`${variantClass} ${className}`} id={id} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button type={type} class={`${variantClass} ${className}`} id={id} {...rest}>
+      <slot />
+    </button>
+  )
+}

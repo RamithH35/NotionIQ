@@ -1,0 +1,45 @@
+---
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  hideFooter?: boolean;
+}
+
+const {
+  title = 'NotionIQ — AI Document Analysis & Active Recall Quiz Workspace',
+  description = 'Transform complex notes and technical documentation into instant synthesis, deep conceptual analysis, and adaptive active recall quizzes.',
+  hideFooter = false,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'><path d='M4 6h16M4 12h11M4 18h16'/><circle cx='19' cy='12' r='2' fill='white'/></svg>" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0a0a0a" />
+
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="min-h-screen flex flex-col bg-[#0a0a0a] text-[#fafafa] selection:bg-[#fafafa] selection:text-[#0a0a0a]">
+    <Nav />
+    <main class="flex-1 w-full page-fade-in relative z-10">
+      <slot />
+    </main>
+    {!hideFooter && <Footer />}
+  </body>
+</html>

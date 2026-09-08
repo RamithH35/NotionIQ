@@ -1,0 +1,101 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/Button.astro';
+import Card from '../components/Card.astro';
+---
+
+<Layout title="About — NotionIQ Philosophy & Engine Architecture">
+  <div class="max-w-5xl mx-auto py-16 px-4 sm:px-6 lg:px-8 space-y-16">
+    <!-- Header with Glassy Hero Card -->
+    <Card variant="featured-glassy" class="text-center md:text-left space-y-6 py-12 md:py-16">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-[6px] bg-[#121212] border border-[#2a2a2a]">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#fafafa]"></span>
+        <span class="font-mono text-xs uppercase tracking-eyebrow text-[#b0b0b0]">
+          Engineering Philosophy
+        </span>
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl font-semibold tracking-display-xl text-[#fafafa] max-w-3xl leading-[1.1]">
+        Re-architecting how technical minds ingest and retain knowledge.
+      </h1>
+
+      <p class="text-base text-[#b0b0b0] max-w-2xl leading-relaxed">
+        Modern documentation repositories and note systems are graveyards for passive text. NotionIQ replaces passive consumption with active synthesis, deterministic vector queries, and high-frequency testing loops.
+      </p>
+
+      <div class="pt-4 flex flex-wrap items-center gap-4">
+        <Button href="/workspace" variant="primary-pill">
+          Launch Workspace
+        </Button>
+        <Button href="/quiz" variant="secondary-square">
+          Try Interactive Quiz Demo
+        </Button>
+      </div>
+    </Card>
+
+    <!-- 2-Up Deep-Dive Feature Grid -->
+    <div class="space-y-6">
+      <div class="flex items-center gap-3">
+        <span class="font-mono text-xs uppercase tracking-wider text-[#7a7a7a]">01 / Core Pillars</span>
+        <div class="flex-1 h-[1px] bg-[#2a2a2a]"></div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Pillar 1 -->
+        <Card variant="default" class="space-y-4">
+          <div class="w-9 h-9 rounded-[6px] bg-[#191919] border border-[#2a2a2a] flex items-center justify-center text-[#fafafa]">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-[#fafafa] tracking-heading-md">Deterministic Grounding</h3>
+          <p class="text-sm text-[#b0b0b0] leading-relaxed">
+            AI inferences are constrained strictly to the boundaries of your uploaded documents. We eliminate creative hallucination in favor of verifiable citations, code tracing, and mathematical proofs.
+          </p>
+        </Card>
+
+        <!-- Pillar 2 -->
+        <Card variant="default" class="space-y-4">
+          <div class="w-9 h-9 rounded-[6px] bg-[#191919] border border-[#2a2a2a] flex items-center justify-center text-[#fafafa]">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-[#fafafa] tracking-heading-md">Active Recall Over Scanning</h3>
+          <p class="text-sm text-[#b0b0b0] leading-relaxed">
+            Cognitive psychology consistently proves that testing mental models immediately after learning produces 300% greater retention than re-reading notes. NotionIQ builds these recall paths automatically.
+          </p>
+        </Card>
+      </div>
+    </div>
+
+    <!-- Security & Privacy Blueprint Card -->
+    <div class="space-y-6">
+      <div class="flex items-center gap-3">
+        <span class="font-mono text-xs uppercase tracking-wider text-[#7a7a7a]">02 / Trust & Privacy</span>
+        <div class="flex-1 h-[1px] bg-[#2a2a2a]"></div>
+      </div>
+
+      <Card variant="default" class="space-y-6 bg-[#121212]">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-[#b0b0b0]">
+          <div class="p-4 rounded-[6px] bg-[#191919] border border-[#2a2a2a] space-y-2">
+            <div class="font-mono text-[#fafafa] font-medium uppercase tracking-wider text-[11px]">Local Sandboxing</div>
+            <p>Documents remain isolated per workspace tenant with zero cross-tenant embedding contamination.</p>
+          </div>
+          <div class="p-4 rounded-[6px] bg-[#191919] border border-[#2a2a2a] space-y-2">
+            <div class="font-mono text-[#fafafa] font-medium uppercase tracking-wider text-[11px]">Zero Training Policy</div>
+            <p>Your uploaded proprietary notes and source code are never used to fine-tune public foundation models.</p>
+          </div>
+          <div class="p-4 rounded-[6px] bg-[#191919] border border-[#2a2a2a] space-y-2">
+            <div class="font-mono text-[#fafafa] font-medium uppercase tracking-wider text-[11px]">Ephemeral Inference</div>
+            <p>Quiz generation tokens stream ephemerally and can be purged permanently with a single keystroke.</p>
+          </div>
+        </div>
+      </Card>
+    </div>
+  </div>
+</Layout>
